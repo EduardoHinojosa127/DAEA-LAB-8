@@ -1,0 +1,115 @@
+﻿@page "/"
+@using System.Text.Json
+@inject NavigationManager NavigationManager
+<PageTitle>Top 5 Autos</PageTitle>
+
+<h1>Autos más populares</h1>
+
+<style>
+    /* Estilos CSS personalizados */
+    .auto-card {
+        width: 300px; /* Ancho de cada tarjeta de auto */
+        margin: 10px; /* Espacio entre las tarjetas */
+        display: inline-block;
+        text-align: center;
+        border: 1px solid #ccc; /* Borde para cada tarjeta */
+    }
+
+    .auto-card img {
+        max-width: 100%; /* Ajusta el ancho de la imagen */
+        height: auto;
+    }
+
+    .auto-info {
+        padding: 10px;
+    }
+</style>
+
+
+@if (!string.IsNullOrEmpty(jsonData))
+{
+    <div class="auto-grid">
+        @foreach (var autoData in autosData)
+        {
+            <div class="auto-card">
+                <img src="@autoData.urlImagen" alt="Imagen del auto" />
+                <div class="auto-info">
+                    <h3>@autoData.marca</h3>
+                    <p>@autoData.modelo</p>
+                    <button class="btn btn-primary" @onclick="() => MostrarDetalles(autoData.id)">Detalles</button>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>Cargando datos...</p>
+}
+
+
+@code {
+    private string jsonData;
+    private List<AutoData> autosData;
+    private HttpClient httpClient;
+
+    protected override async Task OnInitializedAsync()
+    {
+        httpClient = new HttpClient();
+        
+        try
+        {
+            jsonData = await httpClient.GetStringAsync("http://localhost:5186/api/autos");
+            autosData = ParseJsonData(jsonData);
+            if (autosData != null && autosData.Any())
+            {
+                // Ordena los registros de manera aleatoria y toma los primeros 8
+                var random = new Random();
+                autosData = autosData.OrderBy(x => random.Next()).ToList();
+
+                // Toma solo los primeros 8 registros
+                autosData = autosData.Take(10).ToList();
+            }
+        }
+        catch (HttpRequestException)
+        {
+            // Manejar errores de solicitud HTTP
+            // Puedes mostrar un mensaje de error o tomar medidas apropiadas.
+        }
+    }
+
+    private List<AutoData> ParseJsonData(string jsonData)
+    {
+        var autosData = new List<AutoData>();
+
+        // Deserializa el JSON y obtiene solo los datos necesarios
+        var autos = JsonSerializer.Deserialize<List<AutoData>>(jsonData);
+        
+        foreach (var auto in autos)
+        {
+            autosData.Add(new AutoData
+            {
+                id = auto.id,
+                marca = auto.marca,
+                modelo = auto.modelo,
+                urlImagen = auto.urlImagen
+            });
+        }
+
+        return autosData;
+    }
+
+    private void MostrarDetalles(int autoId)
+    {
+        NavigationManager.NavigateTo($"/detallesauto/{autoId}");
+    }
+
+
+    private class AutoData
+    {
+        public int id { get; set;}
+        public string marca { get; set; }
+        public string modelo { get; set; }
+        public string urlImagen { get; set; }
+    }
+}
