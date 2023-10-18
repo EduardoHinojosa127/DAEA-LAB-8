@@ -101,6 +101,7 @@ else
     private bool ModoEdicion;
     private Auto AutoAEditar = new Auto();
     private Auto AutoAEliminar;
+    private string url = "http://localhost:5186/";
     protected override async Task OnInitializedAsync()
     {
         httpClient = new HttpClient();
@@ -111,7 +112,7 @@ else
     {
         try
         {
-            var response = await httpClient.GetStringAsync("http://localhost:5186/api/autos");
+            var response = await httpClient.GetStringAsync($"{url}api/autos");
             autos = JsonSerializer.Deserialize<List<Auto>>(response);
         }
         catch (HttpRequestException)
@@ -142,7 +143,7 @@ else
         // Aquí debes enviar una solicitud HTTP DELETE para eliminar el auto con el ID de "auto.id"
         // Luego, actualiza la lista de autos y oculta la alerta
         // Por ejemplo:
-        var response = await httpClient.DeleteAsync($"http://localhost:5186/api/autos/{auto.id}");
+        var response = await httpClient.DeleteAsync($"{url}api/autos/{auto.id}");
         if (response.IsSuccessStatusCode)
         {
              AutoAEliminar = null;
@@ -179,7 +180,7 @@ else
     private async Task AgregarAuto()
     {
         // Realiza una solicitud GET para obtener la lista actual de autos
-        var response = await httpClient.GetAsync("http://localhost:5186/api/autos");
+        var response = await httpClient.GetAsync($"{url}api/autos");
         
         if (response.IsSuccessStatusCode)
         {
@@ -196,7 +197,7 @@ else
             AutoAEditar.id = maxId + 1;
             Console.WriteLine(AutoAEditar.marca);
             // Luego, puedes enviar la solicitud POST con el nuevo id
-            var responsePost = await httpClient.PostAsJsonAsync("http://localhost:5186/api/autos", AutoAEditar);
+            var responsePost = await httpClient.PostAsJsonAsync($"{url}api/autos", AutoAEditar);
 
             if (responsePost.IsSuccessStatusCode)
             {
@@ -222,7 +223,7 @@ else
         // Luego, actualiza la lista de autos y restablece el modo de edición y formulario
 
         // Por ejemplo:
-        var response = await httpClient.PutAsJsonAsync($"http://localhost:5186/api/autos/{AutoAEditar.id}", AutoAEditar);
+        var response = await httpClient.PutAsJsonAsync($"{url}api/autos/{AutoAEditar.id}", AutoAEditar);
 
         if (response.IsSuccessStatusCode)
         {
