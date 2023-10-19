@@ -178,43 +178,44 @@ else
 
 
     private async Task AgregarAuto()
+{
+    // Realiza una solicitud GET para obtener la lista actual de autos
+    var response = await httpClient.GetAsync($"{url}api/autos");
+    
+    if (response.IsSuccessStatusCode)
     {
-        // Realiza una solicitud GET para obtener la lista actual de autos
-        var response = await httpClient.GetAsync($"{url}api/autos");
-        
-        if (response.IsSuccessStatusCode)
+        // Lee el contenido de la respuesta
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Deserializa la respuesta en una lista de autos
+        var listaDeAutos = JsonSerializer.Deserialize<List<Auto>>(content);
+
+        // Encuentra el auto con el id más alto
+        int maxId = listaDeAutos.Any() ? listaDeAutos.Max(auto => auto.id) : 0;
+
+        // Asigna un nuevo id único al nuevo auto
+        AutoAEditar.id = maxId + 1;
+        Console.WriteLine(AutoAEditar.marca);
+        // Luego, puedes enviar la solicitud POST con el nuevo id
+        var responsePost = await httpClient.PostAsJsonAsync($"{url}api/autos", AutoAEditar);
+
+        if (responsePost.IsSuccessStatusCode)
         {
-            // Lee el contenido de la respuesta
-            var content = await response.Content.ReadAsStringAsync();
-
-            // Deserializa la respuesta en una lista de autos
-            var listaDeAutos = JsonSerializer.Deserialize<List<Auto>>(content);
-
-            // Encuentra el auto con el id más alto
-            int maxId = listaDeAutos.Max(auto => auto.id);
-
-            // Asigna un nuevo id único al nuevo auto
-            AutoAEditar.id = maxId + 1;
-            Console.WriteLine(AutoAEditar.marca);
-            // Luego, puedes enviar la solicitud POST con el nuevo id
-            var responsePost = await httpClient.PostAsJsonAsync($"{url}api/autos", AutoAEditar);
-
-            if (responsePost.IsSuccessStatusCode)
-            {
-                mostrarFormulario = false;
-                AutoAEditar = new Auto();
-                await CargarAutos();
-            }
-            else
-            {
-                // Maneja el escenario en el que la solicitud POST no fue exitosa
-            }
+            mostrarFormulario = false;
+            AutoAEditar = new Auto();
+            await CargarAutos();
         }
         else
         {
-            // Maneja el escenario en el que la solicitud GET para obtener la lista de autos no fue exitosa
+            // Maneja el escenario en el que la solicitud POST no fue exitosa
         }
     }
+    else
+    {
+        // Maneja el escenario en el que la solicitud GET para obtener la lista de autos no fue exitosa
+    }
+}
+
 
     private async Task ActualizarAuto()
     {
