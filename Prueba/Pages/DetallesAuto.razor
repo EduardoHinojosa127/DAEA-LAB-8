@@ -35,7 +35,7 @@ else
             idInt = int.Parse(id);
             Console.WriteLine("Id en int: " + idInt);
 
-            var responseString = await httpClient.GetStringAsync($"http://localhost:5186/api/autos/{idInt}");
+            var responseString = await httpClient.GetStringAsync($"http://back/api/autos/{idInt}");
             Console.WriteLine("Respuesta JSON recibida: " + responseString);
 
 

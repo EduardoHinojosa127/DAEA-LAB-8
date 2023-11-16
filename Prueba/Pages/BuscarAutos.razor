@@ -109,7 +109,7 @@ else if (resultados != null)
             }
 
             // Realiza una solicitud HTTP a la API para obtener todos los autos.
-            var response = await httpClient.GetStringAsync("http://localhost:5186/api/autos");
+            var response = await httpClient.GetStringAsync("http://back/api/autos");
             var autos = JsonSerializer.Deserialize<List<Auto>>(response);
 
             // Filtra los autos según la placa ingresada.

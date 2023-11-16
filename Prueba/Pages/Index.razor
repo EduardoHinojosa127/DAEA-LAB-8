@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @using System.Text.Json
 @inject NavigationManager NavigationManager
 <PageTitle>Top 5 Autos</PageTitle>
@@ -59,7 +59,7 @@ else
         
         try
         {
-            jsonData = await httpClient.GetStringAsync("http://localhost:5186/api/autos");
+            jsonData = await httpClient.GetStringAsync("http://back/api/autos");
             autosData = ParseJsonData(jsonData);
             if (autosData != null && autosData.Any())
             {
